@@ -1,7 +1,17 @@
-import React from "react";
+import React, { Component } from "react";
+import { Route } from "react-router-dom";
+import Home from "./Home";
+import Profile from "./Profile";
 
-function App() {
-  return <div className="App" />;
+class App extends Component {
+  render() {
+    return (
+      <>
+        <Route path="/" exact component={Home} />
+        <Route path="/profile" component={Profile} />
+      </>
+    );
+  }
 }
 
 export default App;
