@@ -5,6 +5,7 @@ class Home extends Component {
     return (
       <div>
         <h1 style={{ padding: 20 }}>Home</h1>
+        <button onClick={this.props.auth.login}>LogIn</button>
       </div>
     );
   }
