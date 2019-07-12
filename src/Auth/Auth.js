@@ -16,7 +16,38 @@ class Auth {
     this.auth0.authorize();
   };
 
-  handleAuthentication = history => {};
+  handleAuthentication = () => {
+    this.auth0.parseHash((err, authResult) => {
+      if (authResult && authResult.accessToken && authResult.idToken) {
+        this.setSession(authResult);
+        this.history.push("/");
+      } else if (err) {
+        this.history.push("/");
+        alert(`Error: ${err.error}. Check console for further details.`);
+        console.log(err);
+      }
+    });
+  };
+
+  //set the time that access token will expire and saving token details to local storage
+  setSession = authResult => {
+    //Unix Epoch Time Calculation below
+    //authResult.expiresIn -> contains JWT expiration time in SECONDS
+    //Converting to miliseconds and adding to current date time.
+    const expiresAt = JSON.stringify(
+      authResult.expiresIn * 1000 + new Date().getTime()
+    );
+
+    localStorage.setItem("access_token", authResult.accessToken);
+    localStorage.setItem("id_token", authResult.idToken);
+    localStorage.setItem("expires_at", expiresAt);
+  };
+
+  isAuthenticated = () => {
+    return (
+      new Date().getTime() < JSON.parse(localStorage.getItem("expires_at"))
+    );
+  };
 }
 
 export default Auth;
