@@ -3,6 +3,7 @@ import auth0 from "auth0-js";
 class Auth {
   constructor(history) {
     this.history = history;
+    this.userProfile = null;
     this.auth0 = new auth0.WebAuth({
       domain: process.env.REACT_APP_AUTH0_DOMAIN,
       clientID: process.env.REACT_APP_AUTH0_CLIENT_ID,
@@ -47,6 +48,38 @@ class Auth {
     return (
       new Date().getTime() < JSON.parse(localStorage.getItem("expires_at"))
     );
+  };
+
+  logout = () => {
+    localStorage.removeItem("id_token");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("expires_at");
+    this.userProfile = null;
+    this.history.push("/");
+    this.auth0.logout({
+      clientID: process.env.REACT_APP_AUTH0_CLIENT_ID,
+      returnTo: "http://localhost:3000"
+    });
+  };
+
+  getAccessToken = () => {
+    const accessToken = localStorage.getItem("access_token");
+    if (!accessToken) {
+      throw new Error("No Access Token Found.");
+    }
+    return accessToken;
+  };
+
+  getProfile = cb => {
+    if (this.userProfile) {
+      return cb(this.userProfile);
+    }
+    this.auth0.client.userInfo(this.getAccessToken(), (err, profile) => {
+      if (profile) {
+        this.userProfile = profile;
+      }
+      cb(profile, err);
+    });
   };
 }
 
