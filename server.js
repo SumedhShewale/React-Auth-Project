@@ -52,7 +52,6 @@ app.get("/admin", checkJwt, checkRole("admin"), function(req, res) {
   res.json({
     message: "Hello from a Admin API!"
   });
-  console.log(message);
 });
 
 app.get("/course", checkJwt, checkScope(["read:courses"]), function(req, res) {

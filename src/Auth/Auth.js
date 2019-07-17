@@ -1,5 +1,7 @@
 import auth0 from "auth0-js";
 
+const REDIRECT_PAGE = "redirectPage";
+
 class Auth {
   constructor(history) {
     this.history = history;
@@ -16,6 +18,7 @@ class Auth {
   }
 
   login = () => {
+    localStorage.setItem(REDIRECT_PAGE, JSON.stringify(this.history.location));
     this.auth0.authorize();
   };
 
@@ -23,12 +26,18 @@ class Auth {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);
-        this.history.push("/");
+        const redirectPage =
+          localStorage.getItem(REDIRECT_PAGE) === null ||
+          REDIRECT_PAGE === undefined
+            ? "/"
+            : JSON.parse(localStorage.getItem(REDIRECT_PAGE));
+        this.history.push(redirectPage);
       } else if (err) {
         this.history.push("/");
         alert(`Error: ${err.error}. Check console for further details.`);
         console.log(err);
       }
+      localStorage.removeItem(REDIRECT_PAGE);
     });
   };
 
